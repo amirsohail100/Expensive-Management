@@ -45,3 +45,12 @@ If you want to run the script directly from the source directory:
    ```bash
    node cli.js
    ```
+
+### Clone the Repository
+
+Open your terminal and run the following command to clone this repository:
+
+```bash
+git clone [https://github.com/amirsohail100/Expensive-Management.git](https://github.com/amirsohail100/Expensive-Management.git)
+cd Expensive-Management
+```
