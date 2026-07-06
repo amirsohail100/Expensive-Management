@@ -1,0 +1,25 @@
+{
+  "name": "anti-gravity",
+  "version": "1.0.0",
+  "description": "Scaffolds a premium, modern Expense Management App inside the current directory.",
+  "main": "cli.js",
+  "bin": {
+    "anti-gravity": "./cli.js"
+  },
+  "scripts": {
+    "start": "node cli.js"
+  },
+  "keywords": [
+    "cli",
+    "scaffold",
+    "expense-tracker",
+    "anti-gravity",
+    "vanilla-js",
+    "dashboard"
+  ],
+  "author": "Amir Sohail",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
