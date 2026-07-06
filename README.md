@@ -12,7 +12,7 @@ Below is a sneak peek of the visually rich, responsive glassmorphic user interfa
 
 <!-- Replace 'your-image-url.png' with your uploaded GitHub image link or local path -->
 
-![Expense Management App UI Preview](your-image-url.png)
+![Expense Management App UI Preview](image-url.png)
 
 ---
 
