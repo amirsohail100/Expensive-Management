@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expensive Management | Dashboard</title>
+  <meta name="description" content="A modern, high-performance, glassmorphism expense manager web app called Expensive Management">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-mode">
+  <div class="app-layout">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-logo">
+        <div class="logo-icon">
+          <i data-lucide="orbit"></i>
+        </div>
+        <div class="logo-text">
+          <h1>Expensive Management</h1>
+          <span class="subtext">Expense Management</span>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <!-- Project Github badge container -->
+        <div id="github-badge-container" class="github-badge-container"></div>
+        
+        <!-- Theme Toggle -->
+        <button id="theme-toggle-btn" class="icon-btn" aria-label="Toggle Theme">
+          <i data-lucide="sun" class="sun-icon"></i>
+          <i data-lucide="moon" class="moon-icon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="app-main">
+      <div class="main-grid">
+        
+        <!-- Sidebar Panel: Inputs and Configurations -->
+        <aside class="sidebar-panel">
+          
+          <!-- Expense Form Card -->
+          <div class="card glass-card form-card">
+            <div class="card-header">
+              <h2 id="form-title"><i data-lucide="plus-circle"></i> Log Expense</h2>
+              <p class="card-subtitle">Keep track of your financial outflows</p>
+            </div>
+            
+            <form id="expense-form" novalidate>
+              <input type="hidden" id="expense-id">
+              
+              <div class="form-group">
+                <label for="expense-amount">Amount (<span id="amount-label-symbol">$</span>)</label>
+                <div class="input-wrapper prefix-wrapper">
+                  <span class="input-prefix" id="amount-prefix-symbol">$</span>
+                  <input type="number" id="expense-amount" placeholder="0.00" step="0.01" min="0.01" required>
+                </div>
+                <div class="error-msg" id="amount-error">Enter a valid amount greater than 0</div>
+              </div>
+
+              <div class="form-group">
+                <label for="expense-category">Category</label>
+                <select id="expense-category" required>
+                  <option value="" disabled selected>Select category</option>
+                  <option value="Food & Dining">Food & Dining</option>
+                  <option value="Shopping">Shopping</option>
+                  <option value="Travel & Transport">Travel & Transport</option>
+                  <option value="Utilities & Rent">Utilities & Rent</option>
+                  <option value="Entertainment">Entertainment</option>
+                  <option value="Health & Fitness">Health & Fitness</option>
+                  <option value="Education">Education</option>
+                  <option value="Others">Others</option>
+                </select>
+                <div class="error-msg" id="category-error">Please select a category</div>
+              </div>
+
+              <div class="form-group">
+                <label for="expense-date">Date</label>
+                <input type="date" id="expense-date" required>
+                <div class="error-msg" id="date-error">Select a valid date</div>
+              </div>
+
+              <div class="form-group">
+                <label for="expense-location">Location / Merchant</label>
+                <div class="input-wrapper">
+                  <i data-lucide="map-pin" class="input-icon"></i>
+                  <input type="text" id="expense-location" placeholder="e.g., Target, Airport" required>
+                </div>
+                <div class="error-msg" id="location-error">Location is required</div>
+              </div>
+
+              <div class="form-group">
+                <label for="expense-desc">Description</label>
+                <div class="input-wrapper">
+                  <i data-lucide="align-left" class="input-icon"></i>
+                  <input type="text" id="expense-desc" placeholder="e.g., Weekly groceries, Flight ticket" required>
+                </div>
+                <div class="error-msg" id="desc-error">Description is required</div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" id="cancel-edit-btn" class="btn btn-secondary hidden">Cancel</button>
+                <button type="submit" id="submit-btn" class="btn btn-primary">Save Expense</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Configuration and Settings Card -->
+          <div class="card glass-card config-card">
+            <h2 class="section-title"><i data-lucide="sliders"></i> Settings</h2>
+            
+            <div class="config-item">
+              <div class="config-info">
+                <span class="config-label">Monthly Target Budget</span>
+                <span id="budget-display-val" class="config-value">$2,000.00</span>
+              </div>
+              <button id="edit-budget-btn" class="btn-sm btn-outline"><i data-lucide="edit-3"></i> Edit</button>
+            </div>
+
+            <div class="config-item">
+              <div class="config-info">
+                <span class="config-label">Project GitHub Link</span>
+                <span id="github-display-val" class="config-value text-truncate">Not Set</span>
+              </div>
+              <button id="edit-github-btn" class="btn-sm btn-outline"><i data-lucide="link-2"></i> Configure</button>
+            </div>
+
+            <div class="config-item">
+              <div class="config-info">
+                <span class="config-label">Global Currency</span>
+                <select id="currency-select" class="currency-select-dropdown" aria-label="Select Currency">
+                  <option value="USD">Dollars ($)</option>
+                  <option value="INR">Rupees (₹)</option>
+                  <option value="EUR">Euros (€)</option>
+                  <option value="GBP">Pounds (£)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Shopping Links Card -->
+          <div class="card glass-card shopping-card">
+            <h2 class="section-title"><i data-lucide="shopping-cart"></i> Quick Shopping</h2>
+            <p class="card-subtitle">Direct links to popular platforms</p>
+            <div class="shopping-links-grid">
+              <a href="https://www.amazon.in" target="_blank" rel="noopener noreferrer" class="shopping-btn btn-amazon">
+                <i data-lucide="external-link"></i> Amazon
+              </a>
+              <a href="https://www.flipkart.com" target="_blank" rel="noopener noreferrer" class="shopping-btn btn-flipkart">
+                <i data-lucide="external-link"></i> Flipkart
+              </a>
+              <a href="https://www.myntra.com" target="_blank" rel="noopener noreferrer" class="shopping-btn btn-myntra">
+                <i data-lucide="external-link"></i> Myntra
+              </a>
+              <a href="https://www.meesho.com" target="_blank" rel="noopener noreferrer" class="shopping-btn btn-meesho">
+                <i data-lucide="external-link"></i> Meesho
+              </a>
+            </div>
+          </div>
+          
+        </aside>
+
+        <!-- Main Dashboard Column -->
+        <section class="dashboard-panel">
+          
+          <!-- Key Metrics / Stats Row -->
+          <div class="stats-grid">
+            
+            <!-- Month spend -->
+            <div class="stat-card card glass-card">
+              <div class="stat-header">
+                <span class="stat-label">This Month</span>
+                <div class="stat-icon icon-monthly">
+                  <i data-lucide="calendar"></i>
+                </div>
+              </div>
+              <div class="stat-content">
+                <h3 id="monthly-total">$0.00</h3>
+                <span class="stat-subtext" id="monthly-compare">Current billing period</span>
+              </div>
+            </div>
+
+            <!-- Year spend -->
+            <div class="stat-card card glass-card">
+              <div class="stat-header">
+                <span class="stat-label">This Year</span>
+                <div class="stat-icon icon-yearly">
+                  <i data-lucide="line-chart"></i>
+                </div>
+              </div>
+              <div class="stat-content">
+                <h3 id="yearly-total">$0.00</h3>
+                <span class="stat-subtext">Cumulative yearly spending</span>
+              </div>
+            </div>
+
+            <!-- Budget remaining -->
+            <div class="stat-card card glass-card" id="budget-stat-card">
+              <div class="stat-header">
+                <span class="stat-label" id="budget-card-label">Budget Limit Status</span>
+                <div class="stat-icon icon-budget" id="budget-status-icon">
+                  <i data-lucide="wallet"></i>
+                </div>
+              </div>
+              <div class="stat-content">
+                <h3 id="budget-remaining">$0.00</h3>
+                <div class="budget-progress-container">
+                  <div class="budget-progress-bar" id="budget-progress-bar"></div>
+                </div>
+                <span class="stat-subtext" id="budget-progress-text">0% of budget spent</span>
+              </div>
+            </div>
+
+            <!-- Total Transactions logged -->
+            <div class="stat-card card glass-card">
+              <div class="stat-header">
+                <span class="stat-label">Total Logs</span>
+                <div class="stat-icon icon-transactions">
+                  <i data-lucide="hash"></i>
+                </div>
+              </div>
+              <div class="stat-content">
+                <h3 id="transaction-count">0</h3>
+                <span class="stat-subtext">Expenses logged on device</span>
+              </div>
+            </div>
+            
+          </div>
+
+          <!-- Interactive Analytics Charts Grid -->
+          <div class="charts-grid">
+            
+            <div class="chart-card card glass-card">
+              <h3>Category Share</h3>
+              <div class="chart-container">
+                <canvas id="category-chart"></canvas>
+                <div id="category-chart-empty" class="chart-empty">
+                  <i data-lucide="pie-chart"></i>
+                  <span>No data to display. Add expenses to generate insights.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-card card glass-card">
+              <h3>Monthly Expense Trend</h3>
+              <div class="chart-container">
+                <canvas id="history-chart"></canvas>
+                <div id="history-chart-empty" class="chart-empty">
+                  <i data-lucide="trending-up"></i>
+                  <span>No data to display. Add expenses to generate insights.</span>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+
+          <!-- Main List / Register Card -->
+          <div class="card glass-card register-card">
+            
+            <div class="register-header">
+              <div class="register-title-section">
+                <h3>Expense Register</h3>
+                <span class="register-count" id="register-count-badge">0 items</span>
+              </div>
+              
+              <div class="register-filters">
+                <div class="search-box">
+                  <i data-lucide="search"></i>
+                  <input type="text" id="search-input" placeholder="Search description, location...">
+                </div>
+
+                <div class="filter-controls">
+                  <select id="filter-category" aria-label="Category Filter">
+                    <option value="all">All Categories</option>
+                    <option value="Food & Dining">Food & Dining</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Travel & Transport">Travel & Transport</option>
+                    <option value="Utilities & Rent">Utilities & Rent</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Health & Fitness">Health & Fitness</option>
+                    <option value="Education">Education</option>
+                    <option value="Others">Others</option>
+                  </select>
+
+                  <div class="date-range-picker">
+                    <input type="date" id="filter-start-date" aria-label="Start Date">
+                    <span class="range-to">to</span>
+                    <input type="date" id="filter-end-date" aria-label="End Date">
+                  </div>
+
+                  <button id="clear-filters-btn" class="btn-sm btn-icon" title="Clear Filters" aria-label="Clear Filters">
+                    <i data-lucide="filter-x"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table id="expenses-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Location</th>
+                    <th>Amount</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="expenses-list">
+                  <!-- JS inserts list here -->
+                </tbody>
+              </table>
+
+              <!-- Empty state wrapper -->
+              <div id="empty-state" class="empty-state">
+                <div class="empty-icon">
+                  <i data-lucide="receipt"></i>
+                </div>
+                <h4>No Logged Expenses</h4>
+                <p>Add expenses using the log form or reset active search filters to refresh the view.</p>
+              </div>
+            </div>
+          </div>
+          
+        </section>
+      </div>
+    </main>
+
+    <!-- Permanent Footer -->
+    <footer class="app-footer">
+      <div class="footer-info">
+        <p>📡 Scaffolded via <strong>anti-gravity</strong> CLI</p>
+      </div>
+      <div class="footer-action">
+        <a href="https://github.com/amirsohail100" target="_blank" rel="noopener noreferrer" class="btn-profile">
+          <i data-lucide="github"></i> Developer Profile
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal: Configure GitHub Repo -->
+  <div id="github-modal" class="modal-backdrop hidden">
+    <div class="modal card glass-card">
+      <div class="modal-header">
+        <h3>GitHub Project Repository</h3>
+        <button id="close-github-modal" class="icon-btn-sm" aria-label="Close Modal"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Adding your repository URL links this local interface to your online source code, showing a link dynamically in the header.</p>
+        <div class="form-group">
+          <label for="github-url-input">GitHub Repository URL</label>
+          <div class="input-wrapper">
+            <i data-lucide="github" class="input-icon"></i>
+            <input type="url" id="github-url-input" placeholder="https://github.com/username/repository" required>
+          </div>
+          <div class="error-msg" id="github-error">Invalid URL. Must begin with http:// or https://</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="clear-github-btn" class="btn btn-danger-outline">Disconnect Link</button>
+        <button id="save-github-btn" class="btn btn-primary">Save Repository</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Monthly Spending Limit -->
+  <div id="budget-modal" class="modal-backdrop hidden">
+    <div class="modal card glass-card">
+      <div class="modal-header">
+        <h3>Edit Monthly Spending Limit</h3>
+        <button id="close-budget-modal" class="icon-btn-sm" aria-label="Close Modal"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Configure a target monthly budget. The remaining budget card and progress indicator will dynamically react as expenses are logged.</p>
+        <div class="form-group">
+          <label for="budget-amount-input">Target Budget Limit (<span id="budget-modal-symbol">$</span>)</label>
+          <div class="input-wrapper prefix-wrapper">
+            <span class="input-prefix" id="budget-prefix-symbol">$</span>
+            <input type="number" id="budget-amount-input" placeholder="2000.00" min="1" step="10" required>
+          </div>
+          <div class="error-msg" id="budget-error">Budget must be at least $1.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-budget-btn" class="btn btn-secondary">Cancel</button>
+        <button id="save-budget-btn" class="btn btn-primary">Save Budget Limit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+  
+  <script src="app.js"></script>
+</body>
+</html>
